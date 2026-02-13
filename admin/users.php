@@ -1,10 +1,11 @@
 <?php
 session_start();
 if (!isset($_SESSION['admin_id'])) {
-    header('Location: admin.html');
+    header('Location: index.html');
     exit;
 }
-require 'api/db_config.php';
+require '../api/db_config.php';
+include '../api/const.php';
 
 // Handle status update
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['user_id']) && isset($_POST['status'])) {
@@ -23,19 +24,36 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>إدارة المستخدمين - الإدمن</title>
-    <link rel="stylesheet" href="styles/css.css">
-    <link rel="stylesheet" href="styles/global.css">
+    <link rel="stylesheet" href="../styles/css.css">
+    <link rel="stylesheet" href="../styles/global.css">
     <style>
-        table { width: 100%; border-collapse: collapse; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-        th { background-color: #f2f2f2; }
-        .status-form { display: inline; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .status-form {
+            display: inline;
+        }
     </style>
 </head>
+
 <body>
     <header>
         <div class="logo">
@@ -73,17 +91,26 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <td><?php echo htmlspecialchars($user['full_name']); ?></td>
                             <td><?php echo htmlspecialchars($user['email']); ?></td>
                             <td><?php echo htmlspecialchars($user['phone']); ?></td>
-                            <td><?php echo htmlspecialchars($user['gender']=="male"?"ذكر":"انثى"); ?></td>
-                            <td><?php echo htmlspecialchars($user['disability_type']); ?></td>
-                            <td><a href="uploads/<?php echo htmlspecialchars($user['disability_file']); ?>" target="_blank">عرض الملف</a></td>
+                            <td><?php echo htmlspecialchars($user['gender'] == "male" ? "ذكر" : "انثى"); ?></td>
+                            <td><?php echo htmlspecialchars($handicap_type[$user['disability_type']]); ?></td>
+                            <td><a href="uploads/<?php echo htmlspecialchars($user['disability_file']); ?>"
+                                    target="_blank">عرض الملف</a></td>
                             <td><?php echo htmlspecialchars($user['birth_date']); ?></td>
-                            <td><?php echo $user['status'] == 1 ? 'محقق' : 'غير محقق'; ?></td>
+                            <td><?php echo $statusOptions[$user['status']] ?></td>
                             <td>
                                 <form method="post" class="status-form">
                                     <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
                                     <select name="status">
-                                        <option value="0" <?php if ($user['status'] == 0) echo 'selected'; ?>>غير محقق</option>
-                                        <option value="1" <?php if ($user['status'] == 1) echo 'selected'; ?>>محقق</option>
+                                        <?php
+                                        foreach ($statusOptions as $value => $label) {
+                                            printf(
+                                                '<option value=%d %s>%s</option>',
+                                                $value,
+                                                ($user['status'] == $value ? 'selected' : ''),
+                                                $label 
+                                            );
+                                        }
+                                        ?>
                                     </select>
                                     <button type="submit">تحديث</button>
                                 </form>
@@ -98,4 +125,5 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <p>&copy; 2026 موقع ذوي الاحتياجات الخاصة. جميع الحقوق محفوظة.</p>
     </footer>
 </body>
+
 </html>

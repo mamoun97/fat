@@ -5,6 +5,7 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 require 'api/db_config.php';
+require 'api/const.php';
 
 // Fetch user data
 $user_id = $_SESSION['user_id'];
@@ -20,6 +21,7 @@ if (!$user) {
 
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,6 +29,7 @@ if (!$user) {
     <link rel="stylesheet" href="styles/css.css">
     <link rel="stylesheet" href="styles/global.css">
 </head>
+
 <body>
     <header>
         <div class="logo">
@@ -40,51 +43,103 @@ if (!$user) {
         </nav>
     </header>
     <main>
-        <section class="account-section" >
-            <div class="form-container" style="margin:24px  auto;">
+        <section class="account-section grid grid-cols-2 gap-4" style="padding: 24px;">
+            <div>
+                <div class="form-container" style="max-width:100%!important">
+                    <p><strong>حالة التحقق :</strong>
+                        <?php echo $statusOptions[$user['status']]; ?>
+                    </p>
+                    <div style="text-align: center;">
+                        <img src="<?php echo $statusOptionsImages[$user['status']]; ?>" style="width:64px;heiht:64px"
+                            alt="">
+                    </div>
+                </div>
+                 <?php if ($user['status'] == 2): ?>
+
+                    <div
+                        class="form-container" style="max-width:100%!important;margin-top:24px">
+
+                        <h2>نموذج الطعن لإعادة دراسة الملف</h2>
+                        <form id="appealForm">
+                            <div class="form-group">
+                                <label for="appealText">أسباب الطعن:</label>
+                                <textarea id="appealText" name="appealText" rows="6"
+                                    style="width:100%; padding:8px; font-family:Arial; border:1px solid #ccc; border-radius:3px;"
+                                    placeholder="الرجاء كتابة أسباب طعنك لإعادة دراسة الملف..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width:100%; margin-top:10px;">إرسال
+                                الطعن</button>
+                        </form>
+                    </div>
+                <?php endif; ?>
+
+
+            </div>
+            <div class="form-container" style="max-width:100%!important">
                 <h2>معلوماتي الشخصية</h2>
-                <p><strong>حالة التحقق:</strong> <?php echo $user['status'] == 1 ? 'محقق' : 'غير محقق'; ?></p>
+
+
+
+               
+
                 <form action="api/update-profile.php" method="post" enctype="multipart/form-data">
                     <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
+                    <input type="hidden" name="appeal_reason" id="appeal_reason" value="">
                     <div class="form-group">
                         <label for="full_name">الاسم الكامل</label>
-                        <input type="text" id="full_name" name="full_name" value="<?php echo htmlspecialchars($user['full_name']); ?>" required>
+                        <input type="text" id="full_name" name="full_name"
+                            value="<?php echo htmlspecialchars($user['full_name']); ?>" required>
                     </div>
                     <div class="form-group">
                         <label for="phone">رقم الهاتف</label>
-                        <input type="tel" id="phone" name="phone" value="<?php echo htmlspecialchars($user['phone']); ?>" required>
+                        <input type="tel" id="phone" name="phone"
+                            value="<?php echo htmlspecialchars($user['phone']); ?>" required>
                     </div>
                     <div class="form-group">
                         <label for="email">البريد الإلكتروني</label>
-                        <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" required>
+                        <input type="email" id="email" name="email"
+                            value="<?php echo htmlspecialchars($user['email']); ?>" required>
                     </div>
                     <div class="form-group">
                         <label for="gender">الجنس</label>
                         <select id="gender" name="gender" required>
-                            <option value="male" <?php if ($user['gender'] == 'male') echo 'selected'; ?>>ذكر</option>
-                            <option value="female" <?php if ($user['gender'] == 'female') echo 'selected'; ?>>أنثى</option>
+                            <option value="male" <?php if ($user['gender'] == 'male')
+                                echo 'selected'; ?>>ذكر</option>
+                            <option value="female" <?php if ($user['gender'] == 'female')
+                                echo 'selected'; ?>>أنثى
+                            </option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="disability_type">نوع الإعاقة</label>
                         <select id="disability_type" name="disability_type" required>
-                            <option value="physical" <?php if ($user['disability_type'] == 'physical') echo 'selected'; ?>>إعاقة جسدية</option>
-                            <option value="mental" <?php if ($user['disability_type'] == 'mental') echo 'selected'; ?>>إعاقة ذهنية</option>
-                            <option value="sensory" <?php if ($user['disability_type'] == 'sensory') echo 'selected'; ?>>إعاقة حسية</option>
-                            <option value="learning" <?php if ($user['disability_type'] == 'learning') echo 'selected'; ?>>إعاقة تعلم</option>
-                            <option value="other" <?php if ($user['disability_type'] == 'other') echo 'selected'; ?>>أخرى</option>
+                            <option value="physical" <?php if ($user['disability_type'] == 'physical')
+                                echo 'selected'; ?>>إعاقة جسدية</option>
+                            <option value="mental" <?php if ($user['disability_type'] == 'mental')
+                                echo 'selected'; ?>>
+                                إعاقة ذهنية</option>
+                            <option value="sensory" <?php if ($user['disability_type'] == 'sensory')
+                                echo 'selected'; ?>>
+                                إعاقة حسية</option>
+                            <option value="learning" <?php if ($user['disability_type'] == 'learning')
+                                echo 'selected'; ?>>إعاقة تعلم</option>
+                            <option value="other" <?php if ($user['disability_type'] == 'other')
+                                echo 'selected'; ?>>أخرى
+                            </option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="disability_file">ملف الإعاقة (اتركه فارغاً إذا لم تريد تغييره)</label>
                         <input type="file" id="disability_file" name="disability_file" accept=".pdf,.jpg,.png">
                         <?php if ($user['disability_file']): ?>
-                            <p>الملف الحالي: <a href="uploads/<?php echo htmlspecialchars($user['disability_file']); ?>" target="_blank">عرض</a></p>
+                            <p>الملف الحالي: <a href="uploads/<?php echo htmlspecialchars($user['disability_file']); ?>"
+                                    target="_blank">عرض</a></p>
                         <?php endif; ?>
                     </div>
                     <div class="form-group">
                         <label for="birth_date">تاريخ الميلاد</label>
-                        <input type="date" id="birth_date" name="birth_date" value="<?php echo htmlspecialchars($user['birth_date']); ?>" required>
+                        <input type="date" id="birth_date" name="birth_date"
+                            value="<?php echo htmlspecialchars($user['birth_date']); ?>" required>
                     </div>
                     <button type="submit" class="btn btn-primary">تحديث المعلومات</button>
                 </form>
@@ -93,26 +148,31 @@ if (!$user) {
     </main>
     <footer>
         <p>&copy; 2026 موقع ذوي الاحتياجات الخاصة. جميع الحقوق محفوظة.</p>
+
     </footer>
     <script>
-        document.querySelector('form').addEventListener('submit', function(e) {
+
+
+        // Handle main form submission
+        form.addEventListener('submit', function (e) {
             e.preventDefault();
             const formData = new FormData(this);
             fetch('api/update-profile.php', {
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.text())
-            .then(data => {
-                alert(data);
-                if (response.status === 200) {
-                    location.reload(); // Reload to show updated data
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+                .then(response => response.text())
+                .then(data => {
+                    alert(data);
+                    if (response.status === 200) {
+                        location.reload(); // Reload to show updated data
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
         });
     </script>
 </body>
+
 </html>
