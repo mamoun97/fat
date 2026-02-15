@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['user_id']) && isset($_
 }
 
 // Fetch all users
-$stmt = $pdo->query("SELECT id, full_name, email, phone, gender, disability_type, disability_file, birth_date, status FROM users");
+$stmt = $pdo->query("SELECT id, full_name, email, phone, gender, disability_type, disability_file, birth_date,note, status FROM users");
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
@@ -82,6 +82,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <th>تاريخ الميلاد</th>
                         <th>الحالة</th>
                         <th>تحديث الحالة</th>
+                        <th>اسباب الطعن</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -115,6 +116,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <button type="submit">تحديث</button>
                                 </form>
                             </td>
+                             <td><?php echo $user['note'] ?></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>

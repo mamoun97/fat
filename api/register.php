@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         if (empty($errors)) {
             // Insert into database
-            $stmt = $pdo->prepare("INSERT INTO users (full_name, phone, email, password, gender, disability_type, disability_file, birth_date, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, NOW(), NOW())");
+            $stmt = $pdo->prepare("INSERT INTO users (full_name, phone, email, password, gender, disability_type, disability_file, birth_date, status,note, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0,null, NOW(), NOW())");
             if ($stmt->execute([$full_name, $phone, $email, $password, $gender, $disability_type, $disability_file, $birth_date])) {
                 http_response_code(200);
                 echo 'Registration successful';
