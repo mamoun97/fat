@@ -14,12 +14,34 @@ $statusOptionsImages = [
 ];
 
 $handicap_type = [
-    "physical" => "إعاقة جسدية",
-    "mental" => "إعاقة ذهنية",
-    "sensory" => "إعاقة حسية",
-    "learning" => "إعاقة تعلم",
-    "other"=> "أخرى"
+    // "physical" => "إعاقة جسدية",
+    "intellectual_disability" => "إعاقة ذهنية",
+    "hearing_impairment" => "إعاقة سمعية",
+    "visual_impairment" => "إعاقة بصرية",
+    "motor_disability" => "إعاقة حركية"
 ];
 
-
+$handicap_helps = [
+    "intellectual_disability" => [
+        "intellectual1" => "مراكز متخصصة للتكفل",
+        "intellectual2" => "برامج تعليم وتأهيل",
+        "intellectual3" => "متابعة نفسية واجتماعية �"
+    ],
+    "hearing_impairment" => [
+        "hearing1" => "أجهزة سمع",
+        "hearing2" => "متابعة طبية وتربوية",
+        "hearing3" => "توجيه لمراكز مختصة",
+    ],
+    "visual_impairment" => [
+        "visual1" => "نظارات طبية",
+        "visual2" => "وسائل تعليم خاصة (برايل، لوحات)",
+        "visual3" => "توجيه لمدارس ومراكز خاصة",
+    ],
+    "motor_disability" => [
+        "motor1" => "كراسي متحركة (عادية أو كهربائية)",
+        "motor2" => "عكازات",
+        "motor3" => "أجهزة تعويضية",
+        "motor4" => " دراجات ثلاثية العجلات �"
+    ]
+];
 ?>

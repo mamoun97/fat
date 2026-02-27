@@ -17,7 +17,7 @@ if (!$user) {
     echo 'User not found';
     exit;
 }
-$msg="";
+$msg = "";
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $user_id = $_SESSION['user_id'];
     $full_name = trim($_POST['full_name']);
@@ -25,9 +25,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = trim($_POST['email']);
     $gender = $_POST['gender'];
     $status = $_POST['status'];
-    $disability_type = $_POST['disability_type'];
+
+    $types = $_POST['disabilities'] ?? [];
+
+    $type = $_POST['type'] ?? "benefit";
+    $handicap_helps = implode(",",$_POST['handicap_helps'] ?? []);
+
+    $intellectual_disability = in_array('intellectual_disability', $types) ? 1 : 0;
+    $hearing_impairment = in_array('hearing_impairment', $types) ? 1 : 0;
+    $visual_impairment = in_array('visual_impairment', $types) ? 1 : 0;
+    $motor_disability = in_array('motor_disability', $types) ? 1 : 0;
+
     $birth_date = $_POST['birth_date'];
-    $note = $_POST['note'];
+    $note = $_POST['note'] ?? null;
 
     // Validation
     $errors = [];
@@ -39,8 +49,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $errors[] = 'Invalid email';
     if (empty($gender))
         $errors[] = 'Gender is required';
-    if (empty($disability_type))
-        $errors[] = 'Disability type is required';
     if (empty($birth_date))
         $errors[] = 'Birth date is required';
 
@@ -74,18 +82,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (empty($errors)) {
             // Update database
             if ($disability_file) {
-                $stmt = $pdo->prepare("UPDATE users SET full_name = ?,`status`=?, note= ?, phone = ?, email = ?, gender = ?, disability_type = ?, disability_file = ?, birth_date = ?, updated_at = NOW() WHERE id = ?");
-                $result = $stmt->execute([$full_name,isset($note)?3:$status, $note, $phone, $email, $gender, $disability_type, $disability_file, $birth_date, $user_id]);
+                $stmt = $pdo->prepare("UPDATE users SET full_name = ?,`status`=?, note= ?, phone = ?, email = ?, gender = ?,handicap_helps=?, intellectual_disability= ?,hearing_impairment= ?,visual_impairment= ?,motor_disability= ?, disability_file = ?, birth_date = ?, updated_at = NOW() WHERE id = ?");
+                $result = $stmt->execute([$full_name, !empty($note) ? 3 : $status, $note, $phone, $email, $gender,$handicap_helps, $intellectual_disability, $hearing_impairment, $visual_impairment, $motor_disability, $disability_file, $birth_date, $user_id]);
             } else {
-                $stmt = $pdo->prepare("UPDATE users SET full_name = ?,`status`=?, note= ?, phone = ?, email = ?, gender = ?, disability_type = ?, birth_date = ?, updated_at = NOW() WHERE id = ?");
-                $result = $stmt->execute([$full_name,isset($note)?3:$status, $note, $phone, $email, $gender, $disability_type, $birth_date, $user_id]);
+                $stmt = $pdo->prepare("UPDATE users SET full_name = ?,`status`=?, note= ?, phone = ?, email = ?, gender = ?,handicap_helps=?, intellectual_disability= ?,hearing_impairment= ?,visual_impairment= ?,motor_disability= ?, birth_date = ?, updated_at = NOW() WHERE id = ?");
+                $result = $stmt->execute([$full_name, !empty($note) ? 3 : $status, $note, $phone, $email, $gender,$handicap_helps, $intellectual_disability, $hearing_impairment, $visual_impairment, $motor_disability, $birth_date, $user_id]);
             }
             if ($result) {
                 http_response_code(200);
-                $msg= '<div style="padding:14px;text-align:center;background-color:green;color:white">تم ارسال التغييرات بنجاح</div>';
+                $msg = '<div style="padding:14px;text-align:center;background-color:green;color:white">تم ارسال التغييرات بنجاح</div>';
+                header("Location: myaccount.php?updated=1");
+                exit;
             } else {
                 http_response_code(400);
-                $msg= '<div style="padding:14px;text-align:center;background-color:green;color:white">حدث خطأ</div>';
+                $msg = '<div style="padding:14px;text-align:center;background-color:green;color:white">حدث خطأ</div>';
             }
         } else {
             http_response_code(400);
@@ -110,12 +120,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>حسابي - ذوي الاحتياجات الخاصة</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&display=swap" rel="stylesheet">
+
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        * {
+            font-family: "Cairo";
+        }
+    </style>
     <link rel="stylesheet" href="styles/css.css">
     <link rel="stylesheet" href="styles/global.css">
 </head>
 
 <body>
-    <?php echo $msg;?>
+    <?php echo $msg; ?>
     <header>
         <div class="logo">
             <h1>ذوي الاحتياجات الخاصة</h1>
@@ -128,7 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </nav>
     </header>
     <main>
-        
+
         <form action="myaccount.php" method="post" enctype="multipart/form-data">
             <section class="account-section grid grid-cols-2 gap-4" style="padding: 24px;">
                 <div>
@@ -150,11 +172,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <div class="form-group">
                                 <label for="note">أسباب الطعن:</label>
                                 <textarea id="note" name="note" rows="6"
-                                value="<?php echo htmlspecialchars($user['note']); ?>"
+                                    value="<?php echo htmlspecialchars($user['note']); ?>"
                                     style="width:100%; padding:8px; font-family:Arial; border:1px solid #ccc; border-radius:3px;"
                                     placeholder="الرجاء كتابة أسباب طعنك لإعادة دراسة الملف..." required></textarea>
                             </div>
-                            
+
                             <button type="submit" class="btn btn-primary" style="width:100%; margin-top:10px;">إرسال
                                 الطعن</button>
 
@@ -200,22 +222,61 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="disability_type">نوع الإعاقة</label>
-                            <select id="disability_type" name="disability_type" required>
-                                <option value="physical" <?php if ($user['disability_type'] == 'physical')
-                                    echo 'selected'; ?>>إعاقة جسدية</option>
-                                <option value="mental" <?php if ($user['disability_type'] == 'mental')
-                                    echo 'selected'; ?>>
-                                    إعاقة ذهنية</option>
-                                <option value="sensory" <?php if ($user['disability_type'] == 'sensory')
-                                    echo 'selected'; ?>>
-                                    إعاقة حسية</option>
-                                <option value="learning" <?php if ($user['disability_type'] == 'learning')
-                                    echo 'selected'; ?>>إعاقة تعلم</option>
-                                <option value="other" <?php if ($user['disability_type'] == 'other')
-                                    echo 'selected'; ?>>أخرى
-                                </option>
-                            </select>
+                            <label for="">نوع الإعاقة</label>
+
+                        </div>
+
+
+                        <?php
+
+
+
+                        foreach ($handicap_type as $value => $label) {
+                            echo '
+    <div class="form-check">
+        <input class="form-check-input"
+               type="checkbox"
+               name="disabilities[]"
+               value="' . $value . '"
+               ' . ($user[$value] == 1 ? "checked" : "") . '>
+               
+        <label class="form-check-label">' . $label . '</label>
+    </div>';
+                        }
+                        ?>
+
+
+
+                        <div class="col-sm-12 card p-4 my-4" id="services" >
+                            <div class="form-group">
+                                <label for="">الخددمة المطلوبة</label>
+                            </div>
+
+                            <div class="list-group">
+
+
+                                <?php
+                                $helps = !empty($user["handicap_helps"])
+                                    ? explode(",", $user["handicap_helps"])
+                                    : [];
+                                foreach ($handicap_helps as $item => $labels) {
+                                    foreach ($labels as $value => $label) {
+
+                                        echo '
+                            <label class="list-group-item d-flex gap-2">
+                            
+                                <input class="form-check-input flex-shrink-0"
+                                    type="checkbox"
+                                    '.(in_array($value, $helps)==1?"checked":"").'
+                                    name="handicap_helps[]"
+                                    value="' . $value . '">
+                                    
+                                ' . $label . '
+                              </label>';
+                                    }
+                                }
+                                ?>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label for="disability_file">ملف الإعاقة (اتركه فارغاً إذا لم تريد تغييره)</label>

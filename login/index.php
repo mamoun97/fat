@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 
 <section class="login-section">
-    <div class="form-container">
+    <div class="form-container" style="max-width: 480px;">
         <h2>تسجيل الدخول</h2>
         <form action="./" method="post">
             <div class="form-group">
