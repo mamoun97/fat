@@ -1,5 +1,5 @@
 <?php
-$base_url = "/fat/";
+$base_url = "/app/";
 ?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">

@@ -12,9 +12,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $types = $_POST['disabilities'] ?? [];
 
-     $type = $_POST['type'] ?? "benefit";
-    $handicap_helps = implode(",",$_POST['handicap_helps'] ?? []);
-    
+    $type = $_POST['type'] ?? "benefit";
+    $handicap_helps = implode(",", $_POST['handicap_helps'] ?? []);
+
 
     $intellectual_disability = in_array('intellectual_disability', $types) ? 1 : 0;
     $hearing_impairment = in_array('hearing_impairment', $types) ? 1 : 0;
@@ -72,9 +72,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (empty($errors)) {
             // Insert into database
             $stmt = $pdo->prepare("INSERT INTO users (full_name, phone, email, password, gender,type,handicap_helps,intellectual_disability ,hearing_impairment,visual_impairment,motor_disability, disability_file, birth_date, status,note, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?,?,?, ?, ?,?,?,?, 0,null, NOW(), NOW())");
-            if ($stmt->execute([$full_name, $phone, $email, $password, $gender,$type,$handicap_helps, $intellectual_disability, $hearing_impairment, $visual_impairment, $motor_disability, $disability_file, $birth_date])) {
+            if ($stmt->execute([$full_name, $phone, $email, $password, $gender, $type, $handicap_helps, $intellectual_disability, $hearing_impairment, $visual_impairment, $motor_disability, $disability_file, $birth_date])) {
                 http_response_code(200);
                 echo 'Registration successful';
+
+
+                $stmtLogin = $pdo->prepare("SELECT id, password FROM users WHERE email = ?");
+                $stmtLogin->execute([$email]);
+                $user = $stmtLogin->fetch(PDO::FETCH_ASSOC);
+
+                if ($user ) {
+                    // Login successful, start session
+                    session_start();
+                    $_SESSION['user_id'] = $user['id'];
+                    echo 'Login successful';
+                    header('Location: ../myaccount.php');
+                    exit;
+                } else {
+                    http_response_code(400);
+                    echo 'Invalid email or password';
+                }
+
             } else {
                 http_response_code(400);
                 echo 'Registration failed';

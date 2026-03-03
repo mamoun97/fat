@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['user_id']) && isset($_
     $status = $_POST['status'];
     $stmt = $pdo->prepare("UPDATE users SET status = ? WHERE id = ?");
     $stmt->execute([$status, $user_id]);
-    header('Location: users.php');
+    header('Location: services.php');
     exit;
 }
 
@@ -56,8 +56,9 @@ $not = ($stmt2->fetchAll(PDO::FETCH_ASSOC));
                     </thead>
                     <tbody>
                         <?php foreach ($users as $user): ?>
-                            <tr>
+                            <tr >
                                 <td>
+                                    
                                     <?php echo htmlspecialchars($user['id']); ?>
                                 </td>
                                 <td>

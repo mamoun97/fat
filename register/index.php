@@ -44,7 +44,7 @@ include "../api/const.php";
                     </div>
                     <div class="form-check">
                         <input type="radio" onchange="type_change('subvention')" class="form-check-input" id="radio2"
-                            name="type" value="subvention">طلب اعانة
+                            name="type" value="subvention">طلب خدمة
                         <label class="form-check-label" for="radio2"></label>
                     </div>
                     <div class="mt-3"></div>
@@ -73,7 +73,7 @@ include "../api/const.php";
                 </div>
                 <div class="col-sm-6" id="services" style="display: none;">
                     <div class="form-group">
-                        <label for="">الخددمة المطلوبة</label>
+                        <label for="">الخدمة المطلوبة</label>
                     </div>
 
                     <div class="list-group">
@@ -124,8 +124,21 @@ include "../api/const.php";
             method: 'POST',
             body: formData
         })
-            .then(response => response.text())
+            .then(response => {
+                console.log(response)
+                if (!response.ok) {
+                    
+                }else{
+                    location.href="../login"
+                    throw new Error();
+                    return null
+                }
+                
+                
+                return response.text();
+            })
             .then(data => {
+                console.log(data)
                 alert(data); // أو عرض في div
             })
             .catch(error => {
@@ -133,7 +146,7 @@ include "../api/const.php";
             });
     });
     function disa_change(event) {
-        console.log(event.value)
+
     }
     function type_change(type) {
         if (type == "subvention")
